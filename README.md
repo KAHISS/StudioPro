@@ -1,5 +1,5 @@
 # StudioPro <img src="assets/Mascara-Studio.ico" alt="Descrição da imagem" style="width:20%;">
-Um sistema personalizado para o salão de estetica Studio Rosa
+Um sistema personalizado para o salão de estética Studio Rosa
 
 ### Features (release 2.5.0)
 1. Sistema de login com níveis (Administrador/usuário)
