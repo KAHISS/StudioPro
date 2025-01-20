@@ -27,7 +27,7 @@ class Aplication(
         self.lastSearch = {}
         self.dataBases = {
             'schedule': DataBase('resources/Agendamentos.db'),
-            'informations': DataBase('resources/Informações.db'),
+            'informations': DataBase('resources/Informacoes.db'),
             'stock': DataBase('resources/Estoque.db'),
             'cash': DataBase('resources/Caixa.db'),
             'config': DataBase('resources/config.db'),
@@ -35,6 +35,7 @@ class Aplication(
         }
         self.criptography = Criptography()
         self.acess = False
+        self.user = ""
         super().__init__()
         self.login_window()
 
@@ -79,7 +80,7 @@ class Aplication(
             type_btn='buttonPhoto', background='white', hover_cursor='white', function=lambda: self.toggle_visibility(password, visibilityPasswordBtn)
         )
         password.bind('<FocusIn>', lambda e: [password.configure(fg_color='#FFFFFF'), visibilityPasswordBtn.configure(fg_color='#FFFFFF')])
-        password.bind('<Return>', lambda e: self.validating_user([userName, password, visibilityPasswordBtn], self.open_software, type_password='login', parameters={'e': ''}))
+        password.bind('<Return>', lambda e: [self.save_user(userName.get()), self.validating_user([userName, password, visibilityPasswordBtn], self.open_software, type_password='login', parameters={'e': ''})])
 
         # line separator higher --------------------
         lineHigher = Canvas(frameInputs, background='#FFFFFF', highlightthickness=0)
@@ -90,7 +91,7 @@ class Aplication(
         loginBtn = self.button(
             frameInputs, 'Iniciar sessão', 0.1, 0.72, 0.8, 0.1, background='#f25298',
             border=0, color='black',
-            function=lambda: self.validating_user([userName, password, visibilityPasswordBtn], self.open_software, type_password='login', parameters={'e': ''})
+            function=lambda: [self.save_user(userName.get()), self.validating_user([userName, password, visibilityPasswordBtn], self.open_software, type_password='login', parameters={'e': ''})]
         )
         closeBtn = self.button(
             frameInputs, 'Fechar', 0.1, 0.85, 0.8, 0.1, background='black',
@@ -112,6 +113,7 @@ class Aplication(
         self.root.bind_all('<Control-d>', lambda e: self.select_diretory_of_cloud())
         self.root.bind_all('<Control-b>', lambda e: [self.backup_dataBase_cloud(), self.backup_dataBase_local()])
         self.root.bind_all('<Control-l>', lambda e: self.loading_database_cloud())
+        print(self.user)
 
         # style notebook
         style = ttk.Style()
@@ -304,7 +306,10 @@ class Aplication(
 
         # buttons management ===========================================
         functions = {
-            'register': lambda: self.register_schedule(entryPicker()[0], self.treeviewSchedule),
+            'register': lambda: self.register_schedule(entryPicker()[0], self.treeviewSchedule) if self.methodPayScheduleEntry.get() != "NOTA" else self.password_window(self.register_schedule, {
+                "information": entryPicker()[0],
+                "treeview": self.treeviewSchedule
+            }),
             'search': lambda: self.search_schedule(self.treeviewSchedule, entryPicker()[0]),
             'order': lambda e: self.search_schedule(self.treeviewSchedule, entryPicker()[0]),
             'update': lambda: self.password_window(self.update_schedule, {'treeview': self.treeviewSchedule, "informations": entryPicker()[0]}),

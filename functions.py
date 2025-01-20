@@ -723,20 +723,24 @@ class FunctionsOfSchedule(GeneralFunctions):
 class FunctionsOfCustomsInformations(GeneralFunctions):
 
     def register_client(self, informations, treeview, button):
-        if self.message_window(4, 'Comfimação', f'Finalisar o cadastro de {informations[0].title()}?'):
-            # informations of treeview ====================
-            self.dataBases['informations'].crud(
-                registerClient.format(
-                    informations[0].upper(), informations[1].upper(), informations[2].upper(), informations[3].upper(), informations[4].upper(), informations[5].upper(),
-                    informations[6].upper(), informations[7].upper(), informations[8].upper(), informations[9].upper(), informations[10].upper(), informations[11], informations[12].upper()
+        client = self.dataBases['informations'].searchDatabase(f'SELECT nome FROM Clientes WHERE nome = "{informations[0].upper()}"')
+        if not client:
+            if self.message_window(4, 'Comfimação', f'Finalisar o cadastro de {informations[0].title()}?'):
+                # informations of treeview ====================
+                self.dataBases['informations'].crud(
+                    registerClient.format(
+                        informations[0].upper(), informations[1].upper(), informations[2].upper(), informations[3].upper(), informations[4].upper(), informations[5].upper(),
+                        informations[6].upper(), informations[7].upper(), informations[8].upper(), informations[9].upper(), informations[10].upper(), informations[11], informations[12].upper()
+                    )
                 )
-            )
-            # deleting and inserting informations in treeview ===============================
-            self.search_client(treeview, informations, 'all', save_seacrh=False)
-            button.invoke()
+                # deleting and inserting informations in treeview ===============================
+                self.search_client(treeview, informations, 'all', save_seacrh=False)
+                button.invoke()
 
-            # refresh =======================================================
-            self.refresh_combobox_client()
+                # refresh =======================================================
+                self.refresh_combobox_client()
+        else:
+            self.message_window(2, 'Já cadastrado', f'{informations[0].title()} Já esta cadastrado')
 
     def search_client(self, treeview=None, informations=None, type_search='new', save_seacrh=True, insert=True):
         # save last search ============================================
@@ -884,18 +888,22 @@ class FunctionsOfCustomsInformations(GeneralFunctions):
 class FunctionsOfProfessionalInformations(GeneralFunctions):
 
     def register_professional(self, informations, treeview, button):
-        if self.message_window(4, 'Comfimação', f'Finalisar o cadastro de {informations[0].title()}?'):
-            # informations of treeview ====================
-            self.dataBases['informations'].crud(
-                registerProfessional.format(
-                    informations[0].upper(), informations[1].upper(), informations[2].upper(), informations[3].upper(), informations[4].upper(), informations[5].upper(),
-                    informations[6].upper(), informations[7].upper(), informations[8].upper(), informations[9].upper(), informations[10].upper(), informations[11], informations[12].upper()
-                ))
-            # deleting and inserting informations in treeview ===============================
-            self.search_professional(treeview, informations, 'all', save_seacrh=False)
-            button.invoke()
-            # refresh =======================================================
-            self.refresh_combobox_professional()
+        professional = self.dataBases['informations'].searchDatabase(f'SELECT nome FROM Profissionais WHERE nome = "{informations[0].upper()}"')
+        if not professional:
+            if self.message_window(4, 'Comfimação', f'Finalisar o cadastro de {informations[0].title()}?'):
+                # informations of treeview ====================
+                self.dataBases['informations'].crud(
+                    registerProfessional.format(
+                        informations[0].upper(), informations[1].upper(), informations[2].upper(), informations[3].upper(), informations[4].upper(), informations[5].upper(),
+                        informations[6].upper(), informations[7].upper(), informations[8].upper(), informations[9].upper(), informations[10].upper(), informations[11], informations[12].upper()
+                    ))
+                # deleting and inserting informations in treeview ===============================
+                self.search_professional(treeview, informations, 'all', save_seacrh=False)
+                button.invoke()
+                # refresh =======================================================
+                self.refresh_combobox_professional()
+        else:
+            self.message_window(2, 'Já cadastrado', f'{informations[0].title()} Já esta cadastrado')
 
     def search_professional(self, treeview=None, informations=None, type_search='new', save_seacrh=True, insert=True):
         # save last search ============================================
@@ -2610,6 +2618,8 @@ class FunctionsOfLogin(GeneralFunctions):
                 entrys[0].configure(fg_color='#f07f7f')
                 entrys[1].configure(fg_color='#f07f7f')
 
+    def save_user(self, user):
+        self.user = user
     def toggle_visibility(self, entry, button):
         current_show = entry.cget("show")
         if current_show == "*":
