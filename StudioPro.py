@@ -31,7 +31,7 @@ class Aplication(
             'stock': DataBase('resources/Estoque.db'),
             'cash': DataBase('resources/Caixa.db'),
             'config': DataBase('resources/config.db'),
-            'backup': DataBase('backup.db')
+            'backup': DataBase('resources/backup.db')
         }
         self.criptography = Criptography()
         self.acess = False
@@ -113,7 +113,7 @@ class Aplication(
         self.root.bind_all('<Control-d>', lambda e: self.select_diretory_of_cloud())
         self.root.bind_all('<Control-b>', lambda e: [self.backup_dataBase_cloud(), self.backup_dataBase_local()])
         self.root.bind_all('<Control-l>', lambda e: self.loading_database_cloud())
-        print(self.user)
+        self.loading_database_local()
 
         # style notebook
         style = ttk.Style()
@@ -246,7 +246,7 @@ class Aplication(
         labelMethodPay = self.labels(self.frameInputsSchedule, 'M/Pagamento:', 0.02, 0.50, width=0.15)
         self.methodPayScheduleEntry = self.entry(
             self.frameInputsSchedule, 0.155, 0.50, 0.165, 0.12, type_entry='list',
-            value=['DINHEIRO', 'CARTÃO', 'TRANSFERÊNCIA', 'NOTA', 'PERMUTA']
+            value=['DINHEIRO', 'CARTÃO', 'TRANSFERÊNCIA', 'NOTA', 'PERMUTA', 'VALE']
         )
 
         # professional -------------
@@ -265,6 +265,10 @@ class Aplication(
         # marking ----------
         labelMarking = self.labels(self.frameInputsSchedule, 'Agendamento:', 0.34, 0.22, width=0.12, color='#803356')
         self.markingScheduleEntry = self.entry(self.frameInputsSchedule, 0.46, 0.22, 0.179, 0.12, type_entry='entry')
+
+        # observation -----------
+        labelObservation = self.labels(self.frameInputsSchedule, 'Observação:', 0.34, 0.36, width=0.12, color='#803356')
+        self.observationSchedule = self.text_box(self.frameInputsSchedule, 0.46, 0.36, 0.18, 0.54)
 
         # event bind frameInput ==========================================
         self.serviceScheduleEntry.bind("<FocusOut>", lambda e: [
@@ -295,7 +299,7 @@ class Aplication(
         self.frameTreeviewSchedule = self.frame(self.scheduleFrame, 0.005, 0.45, 0.989, 0.53)
 
         # Treeview -----------------------------------------------------
-        informationOfTable = ('ID', 'Cliente', 'Serviço', 'Valor', 'Método de Pagamento', 'Profissional',  'Data', 'Horário', 'Agendamento', 'Data de Pagamento')
+        informationOfTable = ('ID', 'Cliente', 'Serviço', 'Valor', 'Método de Pagamento', 'Profissional',  'Data', 'Horário', 'Agendamento', 'observação', 'Data de Pagamento')
         self.treeviewSchedule = self.treeview(self.frameTreeviewSchedule, informationOfTable)
         self.lineTreeviewColor['schedule'] = 0
         # event bind treeview ==========================================
@@ -326,6 +330,9 @@ class Aplication(
             for widget in self.frameInputsSchedule.winfo_children():
                 if isinstance(widget, CTkComboBox) or isinstance(widget, DateEntry) or isinstance(widget, CTkEntry):
                     entrysGet.append(widget.get())
+                    entrys.append(widget)
+                if isinstance(widget, CTkTextbox):
+                    entrysGet.append(widget.get("1.0", "end-1c"))
                     entrys.append(widget)
             entrysGet.append(self.orderBtnSchedule.get())
             return [entrysGet, entrys, ['', '', '', '', '', self.dateScheduleEntry.get(), '', '', self.orderBtnSchedule.get()]]
@@ -1261,7 +1268,7 @@ class Aplication(
         labelMethodPay = self.labels(self.frameInputsSaleInventoryControl, 'M/Pagamento:', 0.34, 0.50, width=0.16, color='#803356')
         self.methodPaySaleInventoryControlEntry = self.entry(
             self.frameInputsSaleInventoryControl, 0.47, 0.50, 0.17, 0.12, type_entry='list',
-            value=['DINHEIRO', 'CARTÃO', 'TRANSFERÊNCIA', 'NOTA', 'SEM PAGAMENTO']
+            value=['DINHEIRO', 'CARTÃO', 'TRANSFERÊNCIA', 'NOTA', 'PERMUTA', 'VALE', 'SEM PAGAMENTO']
         )
 
         # entry -----------------
@@ -1573,7 +1580,7 @@ class Aplication(
         labelMethodPay = self.labels(self.frameInputsSaleInventoryControlUnusable, 'M/Pagamento:', 0.34, 0.50, width=0.16, color='#803356')
         self.MethodPaySaleInventoryControlUnusableEntry = self.entry(
             self.frameInputsSaleInventoryControlUnusable, 0.47, 0.50, 0.17, 0.12, type_entry='list',
-            value=['DINHEIRO', 'CARTÃO', 'TRANSFERÊNCIA', 'NOTA', 'SEM PAGAMENTO']
+            value=['DINHEIRO', 'CARTÃO', 'TRANSFERÊNCIA', 'NOTA', 'PERMUTA', 'VALE', 'SEM PAGAMENTO']
         )
 
         # modify -----------------
@@ -1676,7 +1683,7 @@ class Aplication(
     # ================================== cash register configuration ===============================
 
     def frame_cash_register_management_day(self):
-
+        
         # frame inputs ==========================================
         self.frameInputsCashDay = self.frame(self.typeCashManagement.tab(' Gerenciamento do dia '), 0.30, 0.01, 0.70, 0.43)
 
@@ -1705,8 +1712,12 @@ class Aplication(
         self.noteDayEntry = self.entry(self.frameInputsCashDay, 0.16, 0.78, 0.18, 0.12, type_entry='entry')
 
         # Permute -------------
-        labelPermute = self.labels(self.frameInputsCashDay, 'T/Permuta:', 0.36, 0.08, width=0.16)
-        self.permuteDayEntry = self.entry(self.frameInputsCashDay, 0.485, 0.08, 0.175, 0.12, type_entry='entry')
+        labelPermute = self.labels(self.frameInputsCashDay, 'T/Perm:', 0.36, 0.08, width=0.16)
+        self.permuteDayEntry = self.entry(self.frameInputsCashDay, 0.445, 0.08, 0.08, 0.12, type_entry='entry')
+
+        # Permute -------------
+        labelVale = self.labels(self.frameInputsCashDay, 'T/Vale:', 0.525, 0.08, width=0.16)
+        self.valeDayEntry = self.entry(self.frameInputsCashDay, 0.60, 0.08, 0.08, 0.12, type_entry='entry')
 
         # to receive -----------------
         labelCash = self.labels(self.frameInputsCashDay, 'F/Caixa:', 0.36, 0.22, width=0.16)
@@ -1749,6 +1760,14 @@ class Aplication(
         labelNote.bind('<Double-Button-1>', lambda e: [
             self.search_schedule(self.treeviewCashDaySchedules, ['', '', '', '', labelNote.cget('text'), self.dateDayEntry.get(), ''], type_search='resumeForCash', save_seacrh=False),
             self.search_stock(self.treeviewCashDayProducts, ['', '', '', '', '', '', labelNote.cget('text'), self.dateDayEntry.get()], typeStock='productSaleSold', sqlSearch=searchSoldStockResumeForCash, save_seacrh=False, type_search='resumeForCash')
+        ])
+        labelPermute.bind('<Double-Button-1>', lambda e: [
+            self.search_schedule(self.treeviewCashDaySchedules, ['', '', '', '', labelPermute.cget('text'), self.dateDayEntry.get(), ''], type_search='resumeForCash', save_seacrh=False),
+            self.search_stock(self.treeviewCashDayProducts, ['', '', '', '', '', '', labelPermute.cget('text'), self.dateDayEntry.get()], typeStock='productSaleSold', sqlSearch=searchSoldStockResumeForCash, save_seacrh=False, type_search='resumeForCash')
+        ])
+        labelVale.bind('<Double-Button-1>', lambda e: [
+            self.search_schedule(self.treeviewCashDaySchedules, ['', '', '', '', labelVale.cget('text'), self.dateDayEntry.get(), ''], type_search='resumeForCash', save_seacrh=False),
+            self.search_stock(self.treeviewCashDayProducts, ['', '', '', '', '', '', labelVale.cget('text'), self.dateDayEntry.get()], typeStock='productSaleSold', sqlSearch=searchSoldStockResumeForCash, save_seacrh=False, type_search='resumeForCash')
         ])
         self.dateDayEntry.bind('<<DateEntrySelected>>', lambda e: [
             self.pick_informations_for_cash(entryPicker()[1], self.dateDayEntry.get(), 'day'),
@@ -1794,7 +1813,7 @@ class Aplication(
         self.frameTreeviewCashDayInformations = self.frame(self.typeCashManagement.tab(' Gerenciamento do dia '), 0.43, 0.45, 0.57, 0.53)
 
         # Treeview -----------------------------------------------------
-        informationOfTableInformations = ('ID', 'T/Clientes', 'T/Produtos', 'T/Cartão', 'T/Dinheiro', 'T/Transferência', 'T/nota', 'T/Permuta', 'S/Cartão', 'S/Dinheiro', 'S/Transferência', 'S/Nota', 'S/Permuta', 'Caixa', 'T/Recebido', 'Data')
+        informationOfTableInformations = ('ID', 'T/Clientes', 'T/Produtos', 'T/Cartão', 'T/Dinheiro', 'T/Transferência', 'T/nota', 'T/Permuta', 't/Vale', 'S/Cartão', 'S/Dinheiro', 'S/Transferência', 'S/Nota', 'S/Permuta', 'Caixa', 'T/Recebido', 'Data')
         informationOfTableSchedule = ('Cliente', 'Serviço', 'Valor', 'Método de Pagamento', 'Profissional', 'Data', 'Horário', 'Data de Pagamento')
         informationOfTableProducts = ('Fornecedor', 'Marca', 'Tipo', 'Quantidade', 'Medida', 'V/venda', 'Cliente', 'Método de Pagamento', 'Venda')
         self.treeviewCashDayProducts = self.treeview(self.frameTreeviewCashDayProducts, informationOfTableProducts, max_width=200)
@@ -1901,7 +1920,7 @@ class Aplication(
 
             # order =============================================
             entrysGet.append(self.orderBtnDay.get())
-            return [entrysGet, entrys, ['', '', '', '', '', '', '', '', '', self.dateDayEntry.get(), '', '', self.orderBtnDay.get()]]
+            return [entrysGet, entrys, ['', '', '', '', '', '', '', '', '', '', self.dateDayEntry.get(), '', '', self.orderBtnDay.get()]]
 
         # init search =============================
         self.search_cashManagement(
@@ -1947,8 +1966,12 @@ class Aplication(
         self.noteMonthEntry = self.entry(self.frameInputsCashMonth, 0.16, 0.78, 0.18, 0.12, type_entry='entry')
 
         # Permute -------------
-        labelPermute = self.labels(self.frameInputsCashMonth, 'T/Permuta:', 0.36, 0.08, width=0.16)
-        self.permuteDayEntry = self.entry(self.frameInputsCashMonth, 0.485, 0.08, 0.175, 0.12, type_entry='entry')
+        labelPermute = self.labels(self.frameInputsCashMonth, 'T/Perm:', 0.36, 0.08, width=0.16)
+        self.permuteMonthEntry = self.entry(self.frameInputsCashMonth, 0.445, 0.08, 0.08, 0.12, type_entry='entry')
+
+        # Permute -------------
+        labelVale = self.labels(self.frameInputsCashMonth, 'T/Vale:', 0.525, 0.08, width=0.16)
+        self.valeMonthEntry = self.entry(self.frameInputsCashMonth, 0.60, 0.08, 0.08, 0.12, type_entry='entry')
 
         # total exit -----------------
         labelToReceive = self.labels(self.frameInputsCashMonth, 'Caixa:', 0.36, 0.22, width=0.16)
@@ -2015,7 +2038,7 @@ class Aplication(
 
         # Treeview -----------------------------------------------------
         informationOfTable = ('ID', 'T/Clientes', 'T/Produtos', 'T/Cartão', 'T/Dinheiro', 'T/Transferência', 'T/nota', 'T/Permuta', 'S/Cartão', 'S/Dinheiro', 'S/Transferência', 'S/Nota', 'S/Permuta', 'Caixa', 'T/Recebido', 'Mês')
-        informationOfTableDays = ('ID', 'T/Clientes', 'T/Produtos', 'T/Cartão', 'T/Dinheiro', 'T/Transferência', 'T/nota', 'T/Permuta', 'S/Cartão', 'S/Dinheiro', 'S/Transferência', 'S/Nota', 'S/Permuta', 'Caixa', 'T/Recebido', 'Data')
+        informationOfTableDays = ('ID', 'T/Clientes', 'T/Produtos', 'T/Cartão', 'T/Dinheiro', 'T/Transferência', 'T/nota', 'T/Permuta', 'T/Vale', 'S/Cartão', 'S/Dinheiro', 'S/Transferência', 'S/Nota', 'S/Permuta', 'Caixa', 'T/Recebido', 'Data')
         self.treeviewCashMonth = self.treeview(self.frameTreeviewCashMonth, informationOfTable)
         self.treeviewCashMonthDay = self.treeview(self.frameTreeviewCashMonthDays, informationOfTableDays)
         self.lineTreeviewColor['cashMonth'] = 0
@@ -2143,7 +2166,7 @@ class Aplication(
             entrysGet.append(self.orderBtnMonth.get())
             return [entrysGet, entrys]
 
-        self.search_cashManagement(
+        """self.search_cashManagement(
             self.treeviewCashMonth,
             ['', '', '', '', '', '', '', '', '', self.dateMonthEntry, '', '', 'mês'],
             parameters={
@@ -2152,7 +2175,7 @@ class Aplication(
                 'type_cash': 'cashMonth',
                 'typeDate': 'mês'
             },
-            insert=False)
+            insert=False)"""
 
     def frame_cash_register_management_general(self):
 

@@ -367,6 +367,8 @@ class GeneralFunctions:
                 for entry in entrys:
                     if isinstance(entry, CTkComboBox):
                         entry.set('')
+                    elif isinstance(entry, CTkTextbox):
+                        entry.delete('0.0', END)
                     else:
                         entry.delete(0, END)
                 # cheking if there is information in the treeview ================================
@@ -375,6 +377,8 @@ class GeneralFunctions:
                         for index, information in enumerate(self.selection_treeview(treeview)[0][1:-1]):
                             if isinstance(entrys[index], CTkComboBox):
                                 entrys[index].set(information)
+                            elif isinstance(entrys[index], CTkTextbox):
+                                entrys[index].insert('0.0', information)
                             else:
                                 entrys[index].insert(0, information)
                                 if entrys[index] == self.passwordEntry:
@@ -397,9 +401,9 @@ class GeneralFunctions:
                         # case informations is of cash day
                         if 'R$' in informations[3]:
                             if treeview == self.treeviewCashDayGeneral:
-                                informations = informations[0:8] + informations[13:16]
+                                informations = informations[0:9] + informations[14:17]
                             else:
-                                informations = informations[0:8] + informations[13:16]
+                                informations = informations[0:9] + informations[14:17]
                         if treeview == self.treeviewCashPayment:
                             informations = informations[0:9]
 
@@ -553,7 +557,7 @@ class FunctionsOfSchedule(GeneralFunctions):
                 self.dataBases['schedule'].crud(
                     registerScheduling.format(
                         informations[0].upper(), informations[1].upper(), self.treating_numbers(informations[2], 1), informations[3].upper(), informations[4].upper(),
-                        informations[5], self.treating_numbers(informations[6], 3), datetime.today().strftime('%d/%m/%Y  %H:%M'),
+                        informations[5], self.treating_numbers(informations[6], 3), datetime.today().strftime('%d/%m/%Y  %H:%M'), informations[8].upper(),
                         datetime.today().strftime('%d/%m/%Y  %H:%M') if informations[3] != 'NOTA' else 'SEM PAGAMENTO'
                     ))
                 # deleting and inserting informations in treeview ===============================
@@ -568,7 +572,7 @@ class FunctionsOfSchedule(GeneralFunctions):
         if save_seacrh:
             self.lastSearch['schedule'] = searchSchedule.format(
                 'ID' if informations[0].isnumeric() else 'cliente', informations[0], informations[1], informations[2], informations[3], informations[4],
-                informations[5], informations[6], informations[7], informations[8].replace(' ', '_').lower()
+                informations[5], informations[6], informations[7], informations[8], informations[9].replace(' ', '_').lower()
             )
 
         # pick up informations =========================================
@@ -578,7 +582,7 @@ class FunctionsOfSchedule(GeneralFunctions):
                 informationsDataBase = self.dataBases['schedule'].searchDatabase(
                     searchSchedule.format(
                         'ID' if informations[0].isnumeric() else 'cliente', informations[0], informations[1], informations[2], informations[3], informations[4],
-                        informations[5], informations[6], informations[7], informations[8].replace(' ', '_').lower()
+                        informations[5], informations[6], informations[7], informations[8],  informations[9].replace(' ', '_').lower()
                     )
                 )
             case 'last':
@@ -606,7 +610,7 @@ class FunctionsOfSchedule(GeneralFunctions):
                 informationsDataBase = self.dataBases['schedule'].crud(
                     updateSchedule.format(
                         informations[0].upper(), informations[1].upper(), self.treating_numbers(informations[2], 1), informations[3].upper(), informations[4].upper(),
-                        informations[5].upper(), self.treating_numbers(informations[6], 3), informations[7].upper(),
+                        informations[5].upper(), self.treating_numbers(informations[6], 3), informations[7].upper(), informations[8].upper(),
                         datetime.today().strftime('%d/%m/%Y  %H:%M') if informations[3] != 'NOTA' else 'SEM PAGAMENTO', self.selection_treeview(treeview)[0][0]
                     )
                 )
@@ -651,6 +655,8 @@ class FunctionsOfSchedule(GeneralFunctions):
                 'money': [row for row in informationsTreeview if row[5] in ['DINHEIRO']],
                 'transfer': [row for row in informationsTreeview if row[5] in ['TRANSFERÊNCIA', 'TRANSFERENCIA']],
                 'note': [row for row in informationsTreeview if row[5] in ['NOTA', 'FIADO', 'NOTINHA']],
+                'permute': [row for row in informationsTreeview if row[4] in ['PERMUTA', 'permuta']],
+                'vale': [row for row in informationsTreeview if row[4] in ['VALE', 'vale']],
                 'notPay': [row for row in informationsTreeview if row[5] in ['NÃO FOI PAGO', 'SEM PAGAMENTO', 'NÃO PAGO', '']],
             }
 
@@ -660,6 +666,8 @@ class FunctionsOfSchedule(GeneralFunctions):
                 self.treating_numbers(type_treating=2, values=methoPay["money"]),
                 self.treating_numbers(type_treating=2, values=methoPay["transfer"]),
                 self.treating_numbers(type_treating=2, values=methoPay["note"]),
+                self.treating_numbers(type_treating=2, values=methoPay["permute"]),
+                self.treating_numbers(type_treating=2, values=methoPay["vale"]),
                 self.treating_numbers(type_treating=2, values=methoPay["notPay"]),
                 sumValue
             ]
@@ -668,7 +676,7 @@ class FunctionsOfSchedule(GeneralFunctions):
             for information in informationsTreeview:
                 tableWithInformationsScheduleTreeview1.append(information[0:5])
             for information in informationsTreeview:
-                tableWithInformationsScheduleTreeview2.append(information[5:])
+                tableWithInformationsScheduleTreeview2.append([information[5], information[6], information[7], information[8], information[10]])
             tableWithInformationsComplementarySchedule.append(sumMetohdPay)
 
             # create tables ===========================================
@@ -701,6 +709,8 @@ class FunctionsOfSchedule(GeneralFunctions):
                 'money': [row for row in informationsTreeview if row[4] in ['DINHEIRO']],
                 'transfer': [row for row in informationsTreeview if row[4] in ['TRANSFERÊNCIA', 'TRANSFERENCIA']],
                 'note': [row for row in informationsTreeview if row[4] in ['NOTA', 'FIADO', 'NOTINHA']],
+                'permute': [row for row in informationsTreeview if row[4] in ['PERMUTA', 'permuta']],
+                'vale': [row for row in informationsTreeview if row[4] in ['VALE', 'vale']],
                 'notPay': [row for row in informationsTreeview if row[4] in ['NÃO FOI PAGO', 'SEM PAGAMENTO', 'NÃO PAGO', '']],
             }
 
@@ -713,6 +723,8 @@ class FunctionsOfSchedule(GeneralFunctions):
                 f'Total em dinheiro = {self.treating_numbers(type_treating=2, values=methoPay["money"])}\n'
                 f'Total em tranferència = {self.treating_numbers(type_treating=2, values=methoPay["transfer"])}\n'
                 f'Total em nota = {self.treating_numbers(type_treating=2, values=methoPay["note"])}\n'
+                f'Total em permuta = {self.treating_numbers(type_treating=2, values=methoPay["permute"])}\n'
+                f'Total em vale = {self.treating_numbers(type_treating=2, values=methoPay["vale"])}\n'
                 f'Total não pago = {self.treating_numbers(type_treating=2, values=methoPay["notPay"])}\n'
                 f'Total recebido = {sumValues}'
             )
@@ -1725,14 +1737,14 @@ class FunctionsOfCashManagement(GeneralFunctions):
 
     def register_cashManagement(self, informations, treeview, button, parameters):
         # register usage stock ====================
-        if self.validation(informations[0:7] + [informations[8], informations[9]], 5) and self.validation(informations[0:2], 7) and self.validation(informations[2:9], 8):
+        if self.validation(informations[0:8] + [informations[9], informations[10]], 5) and self.validation(informations[0:2], 7) and self.validation(informations[2:10], 8):
             if self.message_window(4, 'Comfimação', f'Registrar os dados?'):
                 if treeview == self.treeviewCashDayInformations:
                     self.dataBases['cash'].crud(
                         parameters['sqlRegister'].format(
                             parameters['table'], parameters['typeDate'], informations[0].upper(), informations[1].upper(), self.treating_numbers(informations[2], 1), self.treating_numbers(informations[3], 1),
-                            self.treating_numbers(informations[4], 1), self.treating_numbers(informations[5], 1), self.treating_numbers(informations[6], 1), 'R$0,00', 'R$0,00', 'R$0,00', 'R$0,00', 'R$0,00',
-                            self.treating_numbers(informations[7], 1) if informations[7] != '' else self.treating_numbers('0', 1), self.treating_numbers(informations[8], 1), datetime.today().strftime('%d/%m/%Y') if informations[9] == '' else informations[9],
+                            self.treating_numbers(informations[4], 1), self.treating_numbers(informations[5], 1), self.treating_numbers(informations[6], 1), self.treating_numbers(informations[7], 1), 'R$0,00', 'R$0,00', 'R$0,00', 'R$0,00', 'R$0,00',
+                            self.treating_numbers(informations[8], 1) if informations[8] != '' else self.treating_numbers('0', 1), self.treating_numbers(informations[9], 1), datetime.today().strftime('%d/%m/%Y') if informations[10] == '' else informations[10],
                             "DIA EM ANDAMENTO"
                         ))
                 elif treeview == self.frameTreeviewCashMonth:
@@ -1772,14 +1784,15 @@ class FunctionsOfCashManagement(GeneralFunctions):
                 informations[4],
                 informations[5],
                 informations[6],
-                f's_{informations[11]}'.lower() if informations[10] != '' else 's_cartão',
-                informations[10],
                 informations[7],
+                f's_{informations[12]}'.lower() if informations[11] != '' else 's_cartão',
+                informations[11],
                 informations[8],
+                informations[9],
                 '',
                 parameters['typeDate'],
-                informations[9],
-                informations[12].replace('/', '_').lower()
+                informations[10],
+                informations[13].replace('/', '_').lower()
             )
 
         # pick up informations =========================================
@@ -1796,14 +1809,15 @@ class FunctionsOfCashManagement(GeneralFunctions):
                     informations[4],
                     informations[5],
                     informations[6],
-                    f's_{informations[11]}'.lower() if informations[10] != '' else 's_cartão',
-                    informations[10],
                     informations[7],
+                    f's_{informations[12]}'.lower() if informations[11] != '' else 's_cartão',
+                    informations[11],
                     informations[8],
+                    informations[9],
                     '',
                     parameters['typeDate'],
-                    informations[9],
-                    informations[12].replace('/', '_').lower()
+                    informations[10],
+                    informations[13].replace('/', '_').lower()
                 ))
             case 'closeDay':
                 informationsDataBase = self.dataBases['cash'].searchDatabase(searchCashManagement.format(
@@ -1816,14 +1830,15 @@ class FunctionsOfCashManagement(GeneralFunctions):
                     informations[4],
                     informations[5],
                     informations[6],
-                    f's_{informations[11]}'.lower() if informations[10] != '' else 's_cartão',
-                    informations[10],
                     informations[7],
+                    f's_{informations[12]}'.lower() if informations[11] != '' else 's_cartão',
+                    informations[11],
                     informations[8],
+                    informations[9],
                     'DIA FINALIZADO',
                     parameters['typeDate'],
-                    informations[9],
-                    informations[12].replace('/', '_').lower()
+                    informations[10],
+                    informations[13].replace('/', '_').lower()
                 ))
             case 'last':
                 informationsDataBase = self.dataBases['cash'].searchDatabase(self.lastSearch[parameters['type_cash']])
@@ -1892,15 +1907,15 @@ class FunctionsOfCashManagement(GeneralFunctions):
             def date(type_date):
                 match type_date:
                     case 'data':
-                        return datetime.today().strftime('%d/%m/%Y') if informations[9] == '' else informations[9].upper()
+                        return datetime.today().strftime('%d/%m/%Y') if informations[10] == '' else informations[10].upper()
                     case 'mês':
                         return datetime.today().strftime('%m/%Y') if informations[9] == '' else informations[9].upper()
 
-            if self.selection_treeview(treeview)[0][16] in ['DIA EM ANDAMENTO', 'MÊS EM ANDAMENTO', 'MÊS FINALIZADO']:
-                if self.validation(informations[0:10], 5) and self.validation(informations[0:2], 7) and self.validation(informations[2:9], 8):
+            if self.selection_treeview(treeview)[0][17] in ['DIA EM ANDAMENTO', 'MÊS EM ANDAMENTO', 'MÊS FINALIZADO']:
+                if self.validation(informations[0:11], 5) and self.validation(informations[0:2], 7) and self.validation(informations[2:10], 8):
                     # pick value for exit =======================
-                    exitValue = self.treating_numbers(informations[10] if informations[10] != '' else '0', 1)
-                    value = self.dataBases['cash'].searchDatabase(f'SELECT {"s_" + informations[11].lower() if informations[11] != "" else "s_cartão"} FROM {parameters["table"]} WHERE ID = {self.selection_treeview(treeview)[0][0]}')[0][0]
+                    exitValue = self.treating_numbers(informations[11] if informations[11] != '' else '0', 1)
+                    value = self.dataBases['cash'].searchDatabase(f'SELECT {"s_" + informations[12].lower() if informations[12] != "" else "s_cartão"} FROM {parameters["table"]} WHERE ID = {self.selection_treeview(treeview)[0][0]}')[0][0]
                     self.dataBases['cash'].crud(
                         parameters['sqlUpdate'].format(
                             parameters['table'],
@@ -1910,10 +1925,12 @@ class FunctionsOfCashManagement(GeneralFunctions):
                             self.treating_numbers(informations[3], 1),
                             self.treating_numbers(informations[4], 1),
                             self.treating_numbers(informations[5], 1),
-                            "s_" + informations[11].lower() if informations[11] != "" else "s_cartão",
-                            self.treating_numbers(values=[value, exitValue], type_treating=4),
+                            self.treating_numbers(informations[6], 1),
                             self.treating_numbers(informations[7], 1),
+                            "s_" + informations[12].lower() if informations[12] != "" else "s_cartão",
+                            self.treating_numbers(values=[value, exitValue], type_treating=4),
                             self.treating_numbers(informations[8], 1),
+                            self.treating_numbers(informations[9], 1),
                             parameters['typeDate'],
                             date(parameters['typeDate']),
                             self.selection_treeview(treeview)[0][0]
@@ -1921,8 +1938,8 @@ class FunctionsOfCashManagement(GeneralFunctions):
                     )
                     # updating value received =====================================
                     totalReceived = self.treating_numbers(
-                        values=[self.treating_numbers(informations[2], 1), self.treating_numbers(informations[3], 1), self.treating_numbers(informations[4], 1), self.treating_numbers(informations[5], 1), self.treating_numbers(informations[6], 1)], type_treating=4
-                    ) if parameters['table'] == 'Gerenciamento_do_dia' else informations[8]
+                        values=[self.treating_numbers(informations[2], 1), self.treating_numbers(informations[3], 1), self.treating_numbers(informations[4], 1), self.treating_numbers(informations[5], 1), self.treating_numbers(informations[6], 1), self.treating_numbers(informations[7], 1)], type_treating=4
+                    ) if parameters['table'] == 'Gerenciamento_do_dia' else informations[9]
 
                     discount = self.treating_numbers(values=self.dataBases['cash'].searchDatabase(f'SELECT s_cartão, s_dinheiro, s_transferência, s_nota, s_permuta FROM {parameters["table"]} WHERE ID = {self.selection_treeview(treeview)[0][0]}')[0], type_treating=4)
 
@@ -1971,14 +1988,14 @@ class FunctionsOfCashManagement(GeneralFunctions):
             def date(type_date):
                 match type_date:
                     case 'data':
-                        return datetime.today().strftime('%d/%m/%Y') if informations[9] == '' else informations[9].upper()
+                        return datetime.today().strftime('%d/%m/%Y') if informations[10] == '' else informations[10].upper()
                     case 'mês':
                         return datetime.today().strftime('%m/%Y') if informations[8] == '' else informations[8].upper()
 
-            if self.validation(informations[0:10], 5) and self.validation(informations[0:2], 7) and self.validation(informations[2:9], 8):
+            if self.validation(informations[0:11], 5) and self.validation(informations[0:2], 7) and self.validation(informations[2:10], 8):
                 # pick value for exit =======================
-                exitValue = self.treating_numbers(informations[10] if informations[10] != '' else '0', 1)
-                value = self.dataBases['cash'].searchDatabase(f'SELECT {"s_" + informations[11].lower() if informations[11] != "" else "s_cartão"} FROM {parameters["table"]} WHERE ID = {self.selection_treeview(treeview)[0][0]}')[0][0]
+                exitValue = self.treating_numbers(informations[11] if informations[11] != '' else '0', 1)
+                value = self.dataBases['cash'].searchDatabase(f'SELECT {"s_" + informations[12].lower() if informations[12] != "" else "s_cartão"} FROM {parameters["table"]} WHERE ID = {self.selection_treeview(treeview)[0][0]}')[0][0]
                 self.dataBases['cash'].crud(
                     parameters['sqlUpdate'].format(
                         parameters['table'],
@@ -1988,10 +2005,12 @@ class FunctionsOfCashManagement(GeneralFunctions):
                         self.treating_numbers(informations[3], 1),
                         self.treating_numbers(informations[4], 1),
                         self.treating_numbers(informations[5], 1),
-                        "s_" + informations[11].lower() if informations[11] != "" else "s_cartão",
-                        self.treating_numbers(values=[value, exitValue], type_treating=4),
+                        self.treating_numbers(informations[6], 1),
                         self.treating_numbers(informations[7], 1),
+                        "s_" + informations[12].lower() if informations[12] != "" else "s_cartão",
+                        self.treating_numbers(values=[value, exitValue], type_treating=4),
                         self.treating_numbers(informations[8], 1),
+                        self.treating_numbers(informations[9], 1),
                         parameters['typeDate'],
                         date(parameters['typeDate']),
                         self.selection_treeview(treeview)[0][0]
@@ -1999,7 +2018,7 @@ class FunctionsOfCashManagement(GeneralFunctions):
                 )
                 # updating value received =====================================
                 totalReceived = self.treating_numbers(
-                    values=[self.treating_numbers(informations[2], 1), self.treating_numbers(informations[3], 1), self.treating_numbers(informations[4], 1), self.treating_numbers(informations[5], 1), self.treating_numbers(informations[6], 1)], type_treating=4
+                    values=[self.treating_numbers(informations[2], 1), self.treating_numbers(informations[3], 1), self.treating_numbers(informations[4], 1), self.treating_numbers(informations[5], 1), self.treating_numbers(informations[6], 1), self.treating_numbers(informations[7], 1)], type_treating=4
                 ) if parameters['table'] == 'Gerenciamento_do_dia' else informations[8]
 
                 discount = self.treating_numbers(values=self.dataBases['cash'].searchDatabase(f'SELECT s_cartão, s_dinheiro, s_transferência, s_nota, s_permuta FROM {parameters["table"]} WHERE ID = {self.selection_treeview(treeview)[0][0]}')[0], type_treating=4)
@@ -2023,7 +2042,7 @@ class FunctionsOfCashManagement(GeneralFunctions):
     def close_cash(self, treeview, parameters, button, button2):
         # update informations =========================================
         if treeview.selection():
-            if self.selection_treeview(treeview)[0][16] in ['DIA EM ANDAMENTO', 'MÊS EM ANDAMENTO']:
+            if self.selection_treeview(treeview)[0][17] in ['DIA EM ANDAMENTO', 'MÊS EM ANDAMENTO']:
                 if self.message_window(4, 'Comfimação', f'Você tem certeza que quer Fechar o item?'):
                     self.dataBases['cash'].crud(
                         closeDayCashManagement.format(
@@ -2063,7 +2082,7 @@ class FunctionsOfCashManagement(GeneralFunctions):
         match type_informations:
             case 'day':
                 # deleting informations of entrys ============================================
-                for entry in entrys[0:10]:
+                for entry in entrys[0:11]:
                     if isinstance(entry, CTkComboBox):
                         entry.set('')
                     else:
@@ -2110,19 +2129,26 @@ class FunctionsOfCashManagement(GeneralFunctions):
                             self.treating_numbers(type_treating=2, values=[value for value in informationsSold if value[10] in ['PERMUTA', 'SEM PAGAMENTO', 'NÃO FOI PAGO']], ide=7)
                         ]
                     ),
+                    self.treating_numbers(
+                        type_treating=4,
+                        values=[
+                            self.treating_numbers(type_treating=2, values=[value for value in informationsSchedule if value[4] in ['VALE', 'vale']], ide=3),
+                            self.treating_numbers(type_treating=2, values=[value for value in informationsSold if value[10] in ['VALE', 'vale']], ide=7)
+                        ]
+                    ),
                 ]
                 # inserting informations of day ====================================
                 for index, information in enumerate(informationsOfDay):
                     if entrys[index] != self.CashDayEntry:
                         entrys[index].insert(0, information)
-                entrys[8].insert(0, self.treating_numbers(type_treating=4, values=informationsOfDay[2:7]))
-                entrys[9].insert(0, date if date != '' else datetime.today().strftime("%d/%m/%Y"))
+                entrys[9].insert(0, self.treating_numbers(type_treating=4, values=informationsOfDay[2:8]))
+                entrys[10].insert(0, date if date != '' else datetime.today().strftime("%d/%m/%Y"))
                 # searching schedules and products ===================================
-                self.search_schedule(self.treeviewCashDaySchedules, ['', '', '', '', '', entrys[9].get(), ''], type_search='resumeForCash', save_seacrh=False)
-                self.search_stock(self.treeviewCashDayProducts, ['', '', '', '', '', '', '', entrys[9].get()], typeStock='productSaleSold', sqlSearch=searchSoldStockResumeForCash, save_seacrh=False, type_search='resumeForCash')
+                self.search_schedule(self.treeviewCashDaySchedules, ['', '', '', '', '', entrys[10].get(), ''], type_search='resumeForCash', save_seacrh=False)
+                self.search_stock(self.treeviewCashDayProducts, ['', '', '', '', '', '', '', entrys[10].get()], typeStock='productSaleSold', sqlSearch=searchSoldStockResumeForCash, save_seacrh=False, type_search='resumeForCash')
             case 'month':
                 # deleting informations of entrys ============================================
-                for entry in entrys[0:10]:
+                for entry in entrys[0:11]:
                     if isinstance(entry, CTkComboBox):
                         entry.set('')
                     else:
@@ -2167,23 +2193,28 @@ class FunctionsOfCashManagement(GeneralFunctions):
                     self.treating_numbers(
                         type_treating=2,
                         values=informationsDay,
-                        ide=13
+                        ide=8
                     ),
                     self.treating_numbers(
                         type_treating=2,
                         values=informationsDay,
                         ide=14
                     ),
+                    self.treating_numbers(
+                        type_treating=2,
+                        values=informationsDay,
+                        ide=15
+                    ),
                 ]
-
+                print(informationsOfMonth)
                 # inserting informations of day ====================================
                 for index, information in enumerate(informationsOfMonth):
                     entrys[index].insert(0, information)
-                entrys[9].insert(0, date if date != "" else datetime.today().strftime("%m/%Y"))
+                entrys[10].insert(0, date if date != "" else datetime.today().strftime("%m/%Y"))
                 # searching days ===================================
                 self.search_cashManagement(
                     self.treeviewCashMonthDay,
-                    ['', '', '', '', '', '', '', '', '', date if date != "" else datetime.today().strftime("%m/%Y"), '', '', 'data'],
+                    ['', '', '', '', '', '', '', '', '', '', date if date != "" else datetime.today().strftime("%m/%Y"), '', '', 'data'],
                     parameters={
                         'typeDate': 'data',
                         'table': 'Gerenciamento_do_dia',
@@ -2283,7 +2314,7 @@ class FunctionsOfCashManagement(GeneralFunctions):
 
     def search_informations_of_cash(self, treeview, type_search):
         if len(self.pick_informations_treeview(treeview)) > 0:
-            dateForSearch = self.selection_treeview(treeview)[0][15]
+            dateForSearch = self.selection_treeview(treeview)[0][16]
             match type_search:
                 case 'day':
                     # searching schedules and products ===================================

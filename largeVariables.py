@@ -24,8 +24,8 @@ styleTableInformationsComplementary = [
 
 # sql comands for scheduling ===================================
 registerScheduling = (
-    'INSERT INTO Agenda (cliente, serviço, valor, método_de_pagamento, profissional, data, horário, agendamento, data_de_pagamento)'
-    'VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'
+    'INSERT INTO Agenda (cliente, serviço, valor, método_de_pagamento, profissional, data, horário, agendamento, observação, data_de_pagamento)'
+    'VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}",  "{}")'
 )
 searchSchedule = '''SELECT * 
                   FROM Agenda
@@ -36,7 +36,8 @@ searchSchedule = '''SELECT *
                   and profissional LIKE "%{}%"
                   and data LIKE "%{}%"
                   and horário LIKE "%{}%"
-                  and agendamento LIKE "%{}%" ORDER BY {} ASC'''
+                  and agendamento LIKE "%{}%" 
+                  and observação LIKE "%{}%" ORDER BY {} ASC'''
 
 searchScheduleResume = '''SELECT cliente, serviço, valor, método_de_pagamento, profissional, data, horário, data_de_pagamento
                   FROM Agenda
@@ -57,13 +58,14 @@ updateSchedule = '''UPDATE Agenda
                           data = "{}",
                           horário = "{}",
                           agendamento = "{}",
+                          observação = "{}",
                           data_de_pagamento = "{}"
                       WHERE ID = {}'''
 
 # tables for schedule informations =================================
 tableWithInformationsScheduleTreeview1 = [['', '', '', '', ''], ['    ID    ', '    Cliente    ', '    Serviço    ', '    Profissional   ', '    Valor    ']]
 tableWithInformationsScheduleTreeview2 = [['', '', '', '', ''], ['M/Pagamento', 'Data', 'Hrário', 'Agendamento', 'D/Pagamento']]
-tableWithInformationsComplementarySchedule = [['', '', '', '', '', '', ''], ['Total de clientes', 'T/Cartão', 'T/Dinheiro', 'T/Tranferência', 'T/Nota', 'T/Não pago', 'T/Recebido']]
+tableWithInformationsComplementarySchedule = [['', '', '', '', '', '', ''], ['Total de clientes', 'T/Cartão', 'T/Dinheiro', 'T/Tranferência', 'T/Nota', 'T/Perm', 'T/Vale', 'T/Não pago', 'T/Recebido']]
 
 # sql comands for clients informations ==============================
 registerClient = (
@@ -388,14 +390,14 @@ tableWithInformationsSaleStockUnusableTreeview2 = [['', '', '', '', ''], ['V/com
 tableWithInformationsComplementarySaleStockUnusable = [['', '', '', ''], ['Produtos', 'Vt/Compra', 'Vt/Venda', 'Reservados', 'Vencidos']]
 # sql comands for cash ==============================
 registerCashManagement = (
-    'INSERT INTO {} (t_clientes, t_produtos, t_cartão, t_dinheiro, t_transferência, t_nota, t_permuta, s_cartão, s_dinheiro, s_transferência, s_nota, s_permuta, caixa, t_recebido, {}, status)'
-    'VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'
+    'INSERT INTO {} (t_clientes, t_produtos, t_cartão, t_dinheiro, t_transferência, t_nota, t_permuta, t_vale, s_cartão, s_dinheiro, s_transferência, s_nota, s_permuta, caixa, t_recebido, {}, status)'
+    'VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'
 )
 registerCashManagementGeneral = (
     'INSERT INTO {} (t_clientes, t_produtos, t_cartão, t_dinheiro, t_transferência, t_nota, t_permuta, s_cartão, s_dinheiro, s_transferência, s_nota, s_permuta, caixa, t_recebido, periodo, data)'
     'VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'
 )
-searchCashManagement = '''SELECT ID, t_clientes, t_produtos, t_cartão, t_dinheiro, t_transferência, t_nota, t_permuta, s_cartão, s_dinheiro, s_transferência, s_nota, s_permuta, caixa, t_recebido, {}, status
+searchCashManagement = '''SELECT ID, t_clientes, t_produtos, t_cartão, t_dinheiro, t_transferência, t_nota, t_permuta, t_vale, s_cartão, s_dinheiro, s_transferência, s_nota, s_permuta, caixa, t_recebido, {}, status
                   FROM {}
                   WHERE t_clientes LIKE "%{}%"
                   and t_produtos LIKE "%{}%"
@@ -404,6 +406,7 @@ searchCashManagement = '''SELECT ID, t_clientes, t_produtos, t_cartão, t_dinhei
                   and t_transferência LIKE "%{}%"
                   and t_nota LIKE "%{}%"
                   and t_permuta LIKE "%{}%"
+                  and t_vale LIKE "%{}%"
                   and {} LIKE "%{}%"
                   and caixa LIKE "%{}%"
                   and t_recebido LIKE "%{}%"
@@ -444,6 +447,8 @@ updateCashManagement = '''UPDATE {}
                           t_dinheiro = "{}",
                           t_transferência = "{}",
                           t_nota = "{}",
+                          t_permuta = "{}",
+                          t_vale = "{}",
                           {} = "{}",
                           caixa = "{}",
                           t_recebido = "{}",
