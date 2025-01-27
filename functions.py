@@ -157,15 +157,13 @@ class GeneralFunctions:
         return informationsOfInterval
 
     def loading_database_local(self):
-        doLoad = self.dataBases['backup'].searchDatabase('SELECT * FROM Load')[0][0]
-        if doLoad == 'sim':
-            # pick directory if origin =========================
-            origin = os.path.join(os.path.expanduser("~"), "StudioPro/backup/resources")
-            destiny = './resources'
-            # coping ================================
-            if os.path.exists(origin):
-                shutil.rmtree(destiny)
-                shutil.copytree(origin, destiny)
+        # pick directory if origin =========================
+        origin = os.path.join(os.path.expanduser("~"), "StudioPro/backup/resources")
+        destiny = './resources'
+        # coping ================================
+        if os.path.exists(origin):
+            shutil.rmtree(destiny)
+            shutil.copytree(origin, destiny)
 
     def loading_database_cloud(self):
         try:
