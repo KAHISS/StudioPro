@@ -8,3 +8,5 @@ StudioPro.spec
 historic_manager.py
 update.py
 update.spec
+refactorDatabase.py
+refactorDatabase.spec

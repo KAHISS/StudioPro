@@ -25,7 +25,7 @@ styleTableInformationsComplementary = [
 # sql comands for scheduling ===================================
 registerScheduling = (
     'INSERT INTO Agenda (cliente, serviço, valor, método_de_pagamento, profissional, data, horário, agendamento, observação, data_de_pagamento)'
-    'VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}",  "{}")'
+    'VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'
 )
 searchSchedule = '''SELECT * 
                   FROM Agenda
@@ -394,8 +394,8 @@ registerCashManagement = (
     'VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'
 )
 registerCashManagementGeneral = (
-    'INSERT INTO {} (t_clientes, t_produtos, t_cartão, t_dinheiro, t_transferência, t_nota, t_permuta, s_cartão, s_dinheiro, s_transferência, s_nota, s_permuta, caixa, t_recebido, periodo, data)'
-    'VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'
+    'INSERT INTO {} (t_clientes, t_produtos, t_cartão, t_dinheiro, t_transferência, t_nota, t_permuta, t_vale, s_cartão, s_dinheiro, s_transferência, s_nota, s_permuta, caixa, t_recebido, periodo, data)'
+    'VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'
 )
 searchCashManagement = '''SELECT ID, t_clientes, t_produtos, t_cartão, t_dinheiro, t_transferência, t_nota, t_permuta, t_vale, s_cartão, s_dinheiro, s_transferência, s_nota, s_permuta, caixa, t_recebido, {}, status
                   FROM {}
@@ -413,7 +413,7 @@ searchCashManagement = '''SELECT ID, t_clientes, t_produtos, t_cartão, t_dinhei
                   and status LIKE "%{}%"
                   and {} LIKE "%{}%" ORDER BY {} ASC'''
 
-searchCashManagementGeneral = '''SELECT ID, t_clientes, t_produtos, t_cartão, t_dinheiro, t_transferência, t_nota, t_permuta, s_cartão, s_dinheiro, s_transferência, s_nota, s_permuta, caixa, t_recebido, periodo, data
+searchCashManagementGeneral = '''SELECT ID, t_clientes, t_produtos, t_cartão, t_dinheiro, t_transferência, t_nota, t_permuta, t_vale, s_cartão, s_dinheiro, s_transferência, s_nota, s_permuta, caixa, t_recebido, periodo, data
                   FROM {}
                   WHERE t_clientes LIKE "%{}%"
                   and t_produtos LIKE "%{}%"
@@ -422,6 +422,7 @@ searchCashManagementGeneral = '''SELECT ID, t_clientes, t_produtos, t_cartão, t
                   and t_transferência LIKE "%{}%"
                   and t_nota LIKE "%{}%"
                   and t_permuta LIKE "%{}%"
+                  and t_vale LIKE "%{}%"
                   and caixa LIKE "%{}%"
                   and t_recebido LIKE "%{}%"
                   and periodo LIKE "%{}%" ORDER BY {} ASC'''

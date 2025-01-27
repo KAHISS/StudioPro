@@ -2207,8 +2207,12 @@ class Aplication(
         self.noteDayEntry = self.entry(self.frameInputsCashGeneral, 0.16, 0.78, 0.18, 0.12, type_entry='entry')
 
         # Permute -------------
-        labelPermute = self.labels(self.frameInputsCashGeneral, 'T/Permuta:', 0.36, 0.08, width=0.16)
-        self.permuteDayEntry = self.entry(self.frameInputsCashGeneral, 0.485, 0.08, 0.175, 0.12, type_entry='entry')
+        labelPermute = self.labels(self.frameInputsCashGeneral, 'T/Perm:', 0.36, 0.08, width=0.16)
+        self.permuteDayEntry = self.entry(self.frameInputsCashGeneral, 0.445, 0.08, 0.08, 0.12, type_entry='entry')
+
+        # Permute -------------
+        labelVale = self.labels(self.frameInputsCashGeneral, 'T/Vale:', 0.525, 0.08, width=0.16)
+        self.valeDayEntry = self.entry(self.frameInputsCashGeneral, 0.58, 0.08, 0.08, 0.12, type_entry='entry')
 
         # to receive -----------------
         labelCash = self.labels(self.frameInputsCashGeneral, 'F/Caixa:', 0.36, 0.22, width=0.16)
@@ -2256,7 +2260,7 @@ class Aplication(
         self.frameTreeviewCashDayInformations = self.frame(self.typeCashManagement.tab(' Gerenciamento geral '), 0.005, 0.45, 0.989, 0.53)
 
         # Treeview -----------------------------------------------------
-        informationOfTableInformations = ('ID', 'T/Clientes', 'T/Produtos', 'T/Cartão', 'T/Dinheiro', 'T/Transferência', 'T/nota', 'T/Permuta', 'S/Cartão', 'S/Dinheiro', 'S/Transferência', 'S/Nota', 'S/Permuta', 'Caixa', 'T/Recebido', 'Período', 'Data')
+        informationOfTableInformations = ('ID', 'T/Clientes', 'T/Produtos', 'T/Cartão', 'T/Dinheiro', 'T/Transferência', 'T/nota', 'T/Permuta', "T/Vale", 'S/Cartão', 'S/Dinheiro', 'S/Transferência', 'S/Nota', 'S/Permuta', 'Caixa', 'T/Recebido', 'Período', 'Data')
 
         self.treeviewCashDayGeneral = self.treeview(self.frameTreeviewCashDayInformations, informationOfTableInformations)
         self.lineTreeviewColor['cashGeneral'] = 0

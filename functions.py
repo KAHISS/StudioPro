@@ -153,6 +153,11 @@ class GeneralFunctions:
                 values=informationsOfDays,
                 ide=14
             ),
+            self.treating_numbers(
+                type_treating=2,
+                values=informationsOfDays,
+                ide=15
+            ),
         ]
         return informationsOfInterval
 
@@ -425,7 +430,7 @@ class GeneralFunctions:
         return ask
 
     def insert_inputs_generalCash(self, treeview, entrys):
-        for entry in entrys[0:11]:
+        for entry in entrys[0:12]:
             if isinstance(entry, CTkComboBox):
                 entry.set('')
             else:
@@ -434,12 +439,12 @@ class GeneralFunctions:
         informationsOfDays = self.selection_treeview(treeview)[0]
 
         # inserting informations of day ====================================
-        for index, information in enumerate(informationsOfDays[1:8]):
+        for index, information in enumerate(informationsOfDays[1:9]):
             entrys[index].insert(0, information)
-        entrys[7].insert(0, informationsOfDays[13])
         entrys[8].insert(0, informationsOfDays[14])
-        entrys[9].insert(0, informationsOfDays[15][3:13])
-        entrys[10].insert(0, informationsOfDays[15][18:])
+        entrys[9].insert(0, informationsOfDays[15])
+        entrys[10].insert(0, informationsOfDays[16][3:13])
+        entrys[11].insert(0, informationsOfDays[16][18:])
 
     @staticmethod
     def create_pdf(treeview, elements):
@@ -1754,13 +1759,13 @@ class FunctionsOfCashManagement(GeneralFunctions):
                             "MÊS EM ANDAMENTO"
                         ))
                 else:
-                    informationsGeneral = self.calculateDate([informations[9], informations[10]])
+                    informationsGeneral = self.calculateDate([informations[10], informations[11]])
                     self.dataBases['cash'].crud(
                         parameters['sqlRegister'].format(
                             parameters['table'], informationsGeneral[0], informationsGeneral[1], self.treating_numbers(informationsGeneral[2], 1), self.treating_numbers(informationsGeneral[3], 1), self.treating_numbers(informationsGeneral[4], 1),
                             self.treating_numbers(informationsGeneral[5], 1), self.treating_numbers(informationsGeneral[6], 1), self.treating_numbers(informationsGeneral[7], 1), self.treating_numbers(informationsGeneral[8], 1), self.treating_numbers(informationsGeneral[9], 1),
                             self.treating_numbers(informationsGeneral[10], 1), self.treating_numbers(informationsGeneral[11], 1), self.treating_numbers(informationsGeneral[12], 1),
-                            self.treating_numbers(informationsGeneral[13], 1), f'De {informations[9]} até {informations[10]}', datetime.today().strftime('%d/%m/%Y')
+                            self.treating_numbers(informationsGeneral[13], 1), self.treating_numbers(informationsGeneral[14], 1), f'De {informations[10]} até {informations[11]}', datetime.today().strftime('%d/%m/%Y')
                         ))
                 # deleting and inserting informations in treeview ===============================
                 button.invoke()
@@ -1864,8 +1869,9 @@ class FunctionsOfCashManagement(GeneralFunctions):
                 informations[6],
                 informations[7],
                 informations[8],
-                f'De {informations[9]} até {informations[10]}',
-                informations[11].replace('/', '_').lower()
+                informations[9],
+                f'De {informations[10]} até {informations[11]}',
+                informations[12].replace('/', '_').lower()
             )
 
         # pick up informations =========================================
@@ -1884,7 +1890,8 @@ class FunctionsOfCashManagement(GeneralFunctions):
                     informations[7],
                     informations[8],
                     informations[9],
-                    informations[11].replace('/', '_').lower()
+                    f'De {informations[10]} até {informations[11]}',
+                    informations[12].replace('/', '_').lower()
                 ))
             case 'last':
                 informationsDataBase = self.dataBases['cash'].searchDatabase(self.lastSearch[parameters['type_cash']])
@@ -2224,19 +2231,20 @@ class FunctionsOfCashManagement(GeneralFunctions):
 
     def pick_informations_for_cashGeneral(self, entrys):
         # deleting informations of entrys ============================================
-        for entry in entrys[0:9]:
+        for entry in entrys[0:10]:
             if isinstance(entry, CTkComboBox):
                 entry.set('')
             else:
                 entry.delete(0, END)
 
-        informationsOfDays = self.calculateDate([entrys[9].get(), entrys[10].get()])
+        informationsOfDays = self.calculateDate([entrys[10].get(), entrys[11].get()])
+        print(informationsOfDays)
 
         # inserting informations of day ====================================
-        for index, information in enumerate(informationsOfDays[0:7]):
+        for index, information in enumerate(informationsOfDays[0:8]):
             entrys[index].insert(0, information)
-        entrys[7].insert(0, informationsOfDays[12])
         entrys[8].insert(0, informationsOfDays[13])
+        entrys[9].insert(0, informationsOfDays[14])
 
     def pick_infromations_of_schedule_and_products(self, date):
         # searching schedules and products ===================================
@@ -2649,6 +2657,7 @@ class FunctionsOfLogin(GeneralFunctions):
 
     def save_user(self, user):
         self.user = user
+
     def toggle_visibility(self, entry, button):
         current_show = entry.cget("show")
         if current_show == "*":
