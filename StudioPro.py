@@ -1106,22 +1106,18 @@ class Aplication(
         labelexit = self.labels(self.frameInputsUseInventoryControl, 'Saída:', 0.34, 0.22, width=0.16, color='#803356')
         self.exitInputsUseInventoryControlEntry = self.entry(self.frameInputsUseInventoryControl, 0.45, 0.22, 0.189, 0.12, type_entry='entry')
 
-        # remainingAmount -----------------
-        labelRemainingAmount = self.labels(self.frameInputsUseInventoryControl, 'Q/Restante:', 0.34, 0.36, width=0.16, color='#803356')
-        self.remainingAmountUseInventoryControlEntry = self.entry(self.frameInputsUseInventoryControl, 0.45, 0.36, 0.189, 0.12, type_entry='entry')
-
         # entry -----------------
-        labelEntry = self.labels(self.frameInputsUseInventoryControl, 'Entrada:', 0.34, 0.50, width=0.16, color='#803356')
-        self.entryUseInventoryControlEntry = self.entry(self.frameInputsUseInventoryControl, 0.44, 0.50, 0.2, 0.12, type_entry='entry')
+        labelEntry = self.labels(self.frameInputsUseInventoryControl, 'Entrada:', 0.34, 0.36, width=0.16, color='#803356')
+        self.entryUseInventoryControlEntry = self.entry(self.frameInputsUseInventoryControl, 0.44, 0.36, 0.2, 0.12, type_entry='entry')
 
         # modify -----------------
-        labelModify = self.labels(self.frameInputsUseInventoryControl, 'Modificação:', 0.34, 0.64, width=0.16, color='#803356')
-        self.modifyUseInventoryControlEntry = self.entry(self.frameInputsUseInventoryControl, 0.46, 0.64, 0.1794, 0.12, type_entry='entry')
+        labelModify = self.labels(self.frameInputsUseInventoryControl, 'Modificação:', 0.34, 0.50, width=0.16, color='#803356')
+        self.modifyUseInventoryControlEntry = self.entry(self.frameInputsUseInventoryControl, 0.46, 0.50, 0.1794, 0.12, type_entry='entry')
 
         # selection image ---------
-        labelPhoto = self.labels(self.frameInputsUseInventoryControl, 'Foto:', 0.34, 0.78, width=0.16, color='#803356')
+        labelPhoto = self.labels(self.frameInputsUseInventoryControl, 'Foto:', 0.34, 0.64, width=0.16, color='#803356')
         imageBtn = self.button(
-            self.frameInputsUseInventoryControl, 'Selecionar imagem', 0.44, 0.78, 0.2, 0.12, photo=self.photosAndIcons['image'][0],
+            self.frameInputsUseInventoryControl, 'Selecionar imagem', 0.44, 0.64, 0.2, 0.12, photo=self.photosAndIcons['image'][0],
             function=lambda: self.pick_picture(self.labelUseProduct, 'productUse')
         )
 
@@ -1136,7 +1132,7 @@ class Aplication(
         self.frameTreeviewUseInventoryControl = self.frame(self.typeStockmanagement.tab(' Estoque de uso '), 0.005, 0.45, 0.989, 0.53)
 
         # Treeview -----------------------------------------------------
-        informationOfTable = ('ID', 'Fornecedor', 'Marca',  'Produto', 'Quantidade', 'Medida', 'Valor', 'Validade', 'Saída', 'Q/Restante', 'Entrada', 'Modificação')
+        informationOfTable = ('ID', 'Fornecedor', 'Marca',  'Produto', 'Quantidade', 'Medida', 'Valor', 'Validade', 'Modificação')
         self.treeviewUseInventoryControl = self.treeview(self.frameTreeviewUseInventoryControl, informationOfTable)
         self.lineTreeviewColor['productUse'] = 0
         # event bind treeview ==========================================
@@ -1156,7 +1152,7 @@ class Aplication(
 
         # buttons management ============
         functions = {
-            'register': lambda: self.register_stock(entryPicker()[0], self.treeviewUseInventoryControl, sqlRegister=registerUsageStock, table='Estoque_de_uso', typeStock='productUse', button=deleteInformationsInputs),
+            'register': lambda: self.register_stock(entryPicker()[0], self.treeviewUseInventoryControl, sqlRegister=registerUsageStock, table='Estoque_de_uso', typeStock='productUse', button=deleteInformationsInputs, sqlSearch=searchUsageStock),
             'search': lambda: self.search_stock(self.treeviewUseInventoryControl, entryPicker()[0], typeStock='productUse', sqlSearch=searchUsageStock),
             'order': lambda e: self.search_stock(self.treeviewUseInventoryControl, entryPicker()[0], typeStock='productUse', sqlSearch=searchUsageStock),
             'update': lambda: self.password_window(
@@ -1166,7 +1162,8 @@ class Aplication(
                     'parameters': {
                         'sqlUpdate': updateUsageStock,
                         'typeStock': "productUse",
-                        'table': 'Estoque_de_uso'
+                        'table': 'Estoque_de_uso',
+                        'sqlSearch': searchUsageStock
                     }
                 }
             ),
@@ -1213,7 +1210,7 @@ class Aplication(
             return [entrysGet, entrys]
 
         # init search =================================
-        self.search_stock(self.treeviewUseInventoryControl, entryPicker()[0], typeStock='productUse', sqlSearch=searchUsageStock)
+        # self.search_stock(self.treeviewUseInventoryControl, entryPicker()[0], typeStock='productUse', sqlSearch=searchUsageStock)
 
     def frame_sale_inventory_control(self):
         # frame photo ==========================================
@@ -1329,7 +1326,7 @@ class Aplication(
             ),
             'sale': lambda: [
                 self.entrySaleInventoryControlEntry.delete(0, END),
-                self.register_stock(entryPicker()[0], self.treeviewSaleInventoryControlUnusable, sqlRegister=registerSaleStockUnusable, table='Estoque_de_vendidos', typeStock='productSaleSold', delete=True, column='venda'),
+                self.register_stock(entryPicker(sale=True)[0], self.treeviewSaleInventoryControlUnusable, sqlRegister=registerSaleStockUnusable, table='Estoque_de_vendidos', typeStock='productSaleSold', delete=True, column='venda'),
             ],
             'delete': lambda: self.password_window(self.delete_stock, parameter={
                 'treeview': self.treeviewSaleInventoryControl,
@@ -1350,7 +1347,7 @@ class Aplication(
         self.orderBtnSaleIventoryControl = self.tab_of_buttons(0.675, 0.02, 0.3, 0.9, self.frameInputsSaleInventoryControl, functions, self.photosAndIcons, informationOfTable, type_btns='sale')
 
         # pick up entrys ==========================
-        def entryPicker():
+        def entryPicker(sale=False):
             entrysGet = []
             entrys = []
             # entrys of frameInputs =============================
@@ -1367,6 +1364,8 @@ class Aplication(
 
             # observations informations ====================
             entrysGet.append(self.observationSaleinventoryControlEntry.get("1.0", "end-1c"))
+            if sale:
+                entrysGet[10] = datetime.today().strftime('%d/%m/%Y  %H:%M')
             entrys.append(self.observationSaleinventoryControlEntry)
 
             # order =============================================
@@ -1374,7 +1373,7 @@ class Aplication(
             return [entrysGet, entrys]
 
         # init search =================================
-        self.search_stock(self.treeviewSaleInventoryControl, entryPicker()[0], typeStock='productSale', sqlSearch=searchSaleStock)
+        # self.search_stock(self.treeviewSaleInventoryControl, entryPicker()[0], typeStock='productSale', sqlSearch=searchSaleStock)
 
     # ================================== stock unusable configuration ==============================
 
@@ -1525,7 +1524,7 @@ class Aplication(
             return [entrysGet, entrys]
 
         # init search =================================
-        self.search_stock(self.treeviewUseInventoryControlUnusable, entryPicker()[0], typeStock='productUseUnusable', sqlSearch=searchUsageStockUnusable)
+        # self.search_stock(self.treeviewUseInventoryControlUnusable, entryPicker()[0], typeStock='productUseUnusable', sqlSearch=searchUsageStockUnusable)
 
     def frame_sale_inventory_control_unusable(self):
         # frame photo ==========================================
@@ -1678,7 +1677,7 @@ class Aplication(
             return [entrysGet, entrys]
 
         # init search =================================
-        self.search_stock(self.treeviewSaleInventoryControlUnusable, entryPicker()[0], typeStock='productSaleSold', sqlSearch=searchSaleStockUnusable)
+        # self.search_stock(self.treeviewSaleInventoryControlUnusable, entryPicker()[0], typeStock='productSaleSold', sqlSearch=searchSaleStockUnusable)
 
     # ================================== cash register configuration ===============================
 

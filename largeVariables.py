@@ -1,5 +1,6 @@
 # sql comands general==========================================
 searchAll = 'SELECT * FROM {}'
+searchAllForUse = 'SELECT ID, fornecedor, marca, tipo, quantidade, medida, valor, validade, modificação, foto, observação FROM Estoque_de_uso'
 searchAllForSale = 'SELECT ID, fornecedor, marca, tipo, quantidade, medida, valor_de_compra, valor_de_venda, validade, cliente, método_de_pagamento, {}, modificação FROM {}'
 deleteInformation = 'DELETE FROM {} WHERE ID = {}'
 
@@ -206,7 +207,7 @@ registerUsageStock = (
     'INSERT INTO Estoque_de_uso (fornecedor, marca, tipo, quantidade, medida, valor, validade, saída, restante, entrada, modificação, foto, observação)'
     'VALUES ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'
 )
-searchUsageStock = '''SELECT * 
+searchUsageStock = '''SELECT ID, fornecedor, marca, tipo, quantidade, medida, valor, validade, modificação, foto, observação
                   FROM Estoque_de_uso
                   WHERE fornecedor LIKE "%{}%"
                   and marca LIKE "%{}%"
@@ -215,9 +216,6 @@ searchUsageStock = '''SELECT *
                   and medida LIKE "%{}%"
                   and valor LIKE "%{}%"
                   and validade LIKE "%{}%"
-                  and saída LIKE "%{}%"
-                  and restante LIKE "%{}%"
-                  and entrada LIKE "%{}%"
                   and modificação LIKE "%{}%" 
                   and observação LIKE "%{}%" ORDER BY {} ASC'''
 
@@ -230,7 +228,6 @@ updateUsageStock = '''UPDATE Estoque_de_uso
                           valor = "{}",
                           validade = "{}",
                           saída = "{}",
-                          restante = "{}",
                           entrada = "{}",
                           modificação = "{}",
                           foto = "{}",

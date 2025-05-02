@@ -17,10 +17,15 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from barcode import EAN13
 from cv2_collage import create_collage
 import shutil
-import cairosvg
+import stat
 
 
 class GeneralFunctions:
+
+    def remove_readonly(func, path, exc_info):
+        """Força a remoção de arquivos protegidos."""
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
 
     @staticmethod
     def backup_dataBase_local():
@@ -29,7 +34,7 @@ class GeneralFunctions:
         destiny = os.path.join(os.path.expanduser("~"), "StudioPro/backup/resources")
         # coping ================================
         if os.path.exists(destiny):
-            shutil.rmtree(destiny)
+            shutil.rmtree(destiny, onerror=GeneralFunctions.remove_readonly)
             shutil.copytree(origin, destiny)
         else:
             shutil.copytree(origin, destiny)
@@ -48,7 +53,7 @@ class GeneralFunctions:
             destiny = os.path.join(diretoryCloud, "StudioPro/backup/resources")
             # coping ================================
             if os.path.exists(destiny):
-                shutil.rmtree(destiny)
+                shutil.rmtree(destiny, onerror=GeneralFunctions.remove_readonly)
                 shutil.copytree(origin, destiny)
             else:
                 shutil.copytree(origin, destiny)
@@ -167,7 +172,7 @@ class GeneralFunctions:
         destiny = './resources'
         # coping ================================
         if os.path.exists(origin):
-            shutil.rmtree(destiny)
+            shutil.rmtree(destiny, onerror=GeneralFunctions.remove_readonly)
             shutil.copytree(origin, destiny)
 
     def loading_database_cloud(self):
@@ -185,7 +190,7 @@ class GeneralFunctions:
             destiny = './resources'
             # coping ================================
             if os.path.exists(origin):
-                shutil.rmtree(destiny)
+                shutil.rmtree(destiny, onerror=GeneralFunctions.remove_readonly)
                 shutil.copytree(origin, destiny)
 
     def insert_treeview_informations(self, treeview, infos, line_color):
@@ -409,6 +414,10 @@ class GeneralFunctions:
                                 informations = informations[0:9] + informations[14:17]
                         if treeview == self.treeviewCashPayment:
                             informations = informations[0:9]
+                        if treeview == self.treeviewUseInventoryControl:
+                            print(informations)
+                            informations = list(informations[0:8]) + ["0", "0"] + list(informations[8:])
+                        print(informations)
 
                         for index, information in enumerate(informations[1:] if treeview not in [self.treeviewSaleInventoryControl, self.treeviewSaleInventoryControlUnusable] else informations[1:-1] + ('', '')):
                             if isinstance(entrys[index], CTkComboBox) or isinstance(entrys[index], StringVar):
@@ -1163,7 +1172,7 @@ class FunctionsOfServiceInformations(GeneralFunctions):
         self.serviceScheduleEntry.configure(values=[name[1] for name in self.search_service(informations=self.searching_list('', 1, 'serviço'), save_seacrh=False, insert=False)])
 
 
-class FunctionsOfBarCodeInformations(GeneralFunctions):
+"""class FunctionsOfBarCodeInformations(GeneralFunctions):
 
     def register_barCode(self, informations, treeview, button):
         if self.validation(informations[0:3], 5) and self.validation(informations[2], 6):
@@ -1342,7 +1351,7 @@ class FunctionsOfBarCodeInformations(GeneralFunctions):
     def refresh_combobox_barCode(self):
         # refresh list of combobox services ================================
         self.cheatScheduleEntry.configure(values=[name[3] for name in self.search_barCode(informations=self.searching_list('', 3, 'código'), save_seacrh=False, insert=False)])
-
+"""
 
 class FunctionsOfInformationsStock(GeneralFunctions):
 
@@ -1488,7 +1497,6 @@ class FunctionsOfInformationsStock(GeneralFunctions):
         self.search_InformationsStock(self.type['treeview'], ['Tipo', self.type['entry'].get(), self.type['order'].get()], typeInformations='type', table='Tipo')
         self.search_InformationsStock(self.measure['treeview'], ['Medida', self.measure['entry'].get(), self.measure['order'].get()], typeInformations='measure', table='Medida')
 
-
 class FunctionsOfStockInformations(GeneralFunctions):
 
     def register_stock(self, informations, treeview, delete=False, **kwargs):
@@ -1499,12 +1507,12 @@ class FunctionsOfStockInformations(GeneralFunctions):
                     self.dataBases['stock'].crud(
                         kwargs['sqlRegister'].format(
                             informations[0].upper(), informations[1].upper(), informations[2].upper(), '0' if informations[3] == '' else informations[3],
-                            informations[4].upper(), self.treating_numbers(informations[5], 1), informations[6], '0' if informations[7] == '' else informations[7],
-                            informations[3] if informations[8] == '' else informations[8], datetime.today().strftime('%d/%m/%Y  %H:%M') if informations[9] == '' else informations[9].upper(),
-                            datetime.today().strftime('%d/%m/%Y  %H:%M') if informations[10] == '' else informations[10].upper(), informations[11], informations[12].upper()
+                            informations[4].upper(), self.treating_numbers(informations[5], 1), informations[6], '0' ,
+                            informations[3], "0",
+                            datetime.today().strftime('%d/%m/%Y  %H:%M') if informations[9] == '' else informations[9].upper(), informations[10], informations[11].upper()
                         ))
                     # deleting and inserting informations in treeview ===============================
-                    self.search_stock(treeview, informations, 'all', table=kwargs['table'], save_seacrh=False, typeStock=kwargs['typeStock'])
+                    self.search_stock(treeview, informations, 'allForUse', table=kwargs['table'], save_seacrh=False, typeStock=kwargs['typeStock'], sqlSearch=kwargs['sqlSearch'])
                     kwargs['button'].invoke()
             else:
                 # show message error =====================================================
@@ -1520,13 +1528,13 @@ class FunctionsOfStockInformations(GeneralFunctions):
                             informations[0].upper(), informations[1].upper(), informations[2].upper(), '0' if informations[3] == '' else informations[3],
                             informations[4].upper(), self.treating_numbers(informations[5], 1), self.treating_numbers(informations[6], 1), informations[7],
                             'NENHUM' if informations[8] == '' else informations[8], 'SEM PAGAMENTO' if informations[9] == '' else informations[9].upper(),
-                            datetime.today().strftime('%d/%m/%Y  %H:%M') if informations[10] == '' else informations[10].upper(), informations[11], informations[12], datetime.today().strftime('%d/%m/%Y  %H:%M')
+                            informations[10] if informations[10] != "" else "0", informations[11], informations[12], datetime.today().strftime('%d/%m/%Y  %H:%M')
                         ))
                     # deleting and inserting informations in treeview ===============================
                     self.search_stock(treeview, informations, 'allSale', table=kwargs['table'], save_seacrh=False, typeStock=kwargs['typeStock'], column=kwargs['column'])
                     if delete:
-                        self.delete_stock(self.treeviewSaleInventoryControl, parameters={'table': 'Estoque_de_vendidos', 'typeStock': 'productSaleSold', 'column': 'venda'})
-                    kwargs['button'].invoke()
+                        self.dataBases['stock'].crud(f'UPDATE Estoque_de_venda SET quantidade = {int(informations[3]) - 1} WHERE ID = {self.selection_treeview(self.treeviewSaleInventoryControl)[0][0]}')
+                        self.search_stock(self.treeviewSaleInventoryControl, informations, 'allSale', table='Estoque_de_venda', save_seacrh=False, typeStock='productSale', column="ID")
             else:
                 # show message error =====================================================
                 self.message_window(3, 'Erro', 'Verifique se os campos estão preenchidos ou corretos')
@@ -1534,26 +1542,42 @@ class FunctionsOfStockInformations(GeneralFunctions):
     def search_stock(self, treeview=None, informations=None, type_search='new', save_seacrh=True, insert=True, **kwargs):
         # save last search ============================================
         if save_seacrh:
-            self.lastSearch[kwargs['typeStock']] = kwargs['sqlSearch'].format(
-                informations[0], informations[1], informations[2], informations[3], informations[4],
-                informations[5], informations[6], informations[7], informations[8], informations[9],
-                informations[10], informations[12], informations[13].replace('Q/', '').replace('V/', 'valor_de_').replace('D/', 'data_de_').replace(' ', '_').lower()
-            )
+            if kwargs['sqlSearch'] == searchUsageStock:
+                self.lastSearch[kwargs['typeStock']] = kwargs['sqlSearch'].format(
+                    informations[0], informations[1], informations[2], informations[3], informations[4],
+                    informations[5], informations[6], informations[9], informations[11], informations[12].replace('Q/', '').replace('V/', 'valor_de_').replace('D/', 'data_de_').replace(' ', '_').lower()
+                )
+            else:
+                self.lastSearch[kwargs['typeStock']] = kwargs['sqlSearch'].format(
+                    informations[0], informations[1], informations[2], informations[3], informations[4],
+                    informations[5], informations[6], informations[7], informations[8], informations[9],
+                    informations[10], informations[12], informations[13].replace('Q/', '').replace('V/', 'valor_de_').replace('D/', 'data_de_').replace(' ', '_').lower()
+                )
         # pick up informations =========================================
         informationsDataBase = []
         match type_search:
             case 'new':
-                informationsDataBase = self.dataBases['stock'].searchDatabase(
-                    kwargs['sqlSearch'].format(
-                        informations[0], informations[1], informations[2], informations[3], informations[4],
-                        informations[5], informations[6], informations[7], informations[8], informations[9],
-                        informations[10], informations[12], informations[13].replace('Q/', '').replace('V/', 'valor_de_').replace('D/', 'data_de_').replace(' ', '_').lower()
+                if kwargs['sqlSearch'] == searchUsageStock:
+                    informationsDataBase = self.dataBases['stock'].searchDatabase(
+                        kwargs['sqlSearch'].format(
+                            informations[0], informations[1], informations[2], informations[3], informations[4],
+                            informations[5], informations[6], informations[9], informations[11], informations[12].replace('Q/', '').replace('V/', 'valor_de_').replace('D/', 'data_de_').replace(' ', '_').lower()
+                        )
                     )
-                )
+                else:
+                    informationsDataBase = self.dataBases['stock'].searchDatabase(
+                        kwargs['sqlSearch'].format(
+                            informations[0], informations[1], informations[2], informations[3], informations[4],
+                            informations[5], informations[6], informations[7], informations[8], informations[9],
+                            informations[10], informations[12], informations[13].replace('Q/', '').replace('V/', 'valor_de_').replace('D/', 'data_de_').replace(' ', '_').lower()
+                        )
+                    )
             case 'last':
                 informationsDataBase = self.dataBases['stock'].searchDatabase(self.lastSearch[kwargs['typeStock']])
             case 'all':
                 informationsDataBase = self.dataBases['stock'].searchDatabase(searchAll.format(kwargs['table']))
+            case 'allForUse':
+                informationsDataBase = self.dataBases['stock'].searchDatabase(searchAllForUse.format(kwargs['table']))
             case 'allSale':
                 informationsDataBase = self.dataBases['stock'].searchDatabase(searchAllForSale.format(kwargs['column'], kwargs['table']))
             case 'resumeForCash':
@@ -1578,10 +1602,10 @@ class FunctionsOfStockInformations(GeneralFunctions):
                 if self.validation(informations[0:7], 5) and self.validation(informations[3], 3) and self.validation(self.treating_numbers(informations[5], 1), 4):
                     self.dataBases['stock'].crud(
                         parameters['sqlUpdate'].format(
-                            informations[0].upper(), informations[1].upper(), informations[2].upper(), '0' if informations[3] == '' else informations[3],
-                            informations[4].upper(), self.treating_numbers(informations[5], 1), informations[6], "0" if informations[7] == '' else informations[7],
-                            int(informations[8]) - int(informations[7]), datetime.today().strftime('%d/%m/%Y  %H:%M') if informations[9] == '' else informations[9].upper(),
-                            datetime.today().strftime('%d/%m/%Y  %H:%M'), informations[11], informations[12].upper(), self.selection_treeview(treeview)[0][0]
+                            informations[0].upper(), informations[1].upper(), informations[2].upper(), int(informations[3]) - int(informations[7]) + int(informations[8]),
+                            informations[4].upper(), self.treating_numbers(informations[5], 1), informations[6], "0",
+                            "0",
+                            datetime.today().strftime('%d/%m/%Y  %H:%M'), informations[10], informations[11].upper(), self.selection_treeview(treeview)[0][0]
                         )
                     )
                     search = self.dataBases['stock'].searchDatabase(f'SELECT quantidade, restante FROM {parameters["table"]} WHERE ID = {self.selection_treeview(treeview)[0][0]}')[0]
@@ -1590,7 +1614,7 @@ class FunctionsOfStockInformations(GeneralFunctions):
                     self.delete_informations_treeview(treeview, parameters['typeStock'])
 
                     # deleting and inserting informations in treeview ===============================
-                    self.search_stock(treeview, informations, 'last', save_seacrh=False, typeStock=parameters['typeStock'])
+                    self.search_stock(treeview, informations, 'last', save_seacrh=False, typeStock=parameters['typeStock'], sqlSearch=parameters['sqlSearch'])
 
                     # show message of concluded
                     self.message_window(1, 'Concluído', messagein=f'Produto atualizado com sucesso')
@@ -1603,10 +1627,10 @@ class FunctionsOfStockInformations(GeneralFunctions):
                 if self.validation(informations[0:8], 5) and self.validation(informations[3], 3) and self.validation(valuesPrice[0], 4) and self.validation(valuesPrice[1], 4):
                     self.dataBases['stock'].crud(
                         parameters['sqlUpdate'].format(
-                            informations[0].upper(), informations[1].upper(), informations[2].upper(), '0' if informations[3] == '' else informations[3],
+                            informations[0].upper(), informations[1].upper(), informations[2].upper(), int(informations[3]) + int(informations[10]),
                             informations[4].upper(), self.treating_numbers(informations[5], 1), self.treating_numbers(informations[6], 1), informations[7],
                             'NENHUM' if informations[8] == '' else informations[8], 'SEM PAGAMENTO' if informations[9] == '' else informations[9].upper(),
-                            informations[10], informations[11], informations[12].upper(), datetime.today().strftime('%d/%m/%Y  %H:%M'), self.selection_treeview(treeview)[0][0]
+                            "0", informations[11], informations[12].upper(), datetime.today().strftime('%d/%m/%Y  %H:%M'), self.selection_treeview(treeview)[0][0]
                         )
                     )
                     # delete informations of treeview ==============================
